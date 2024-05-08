@@ -7,7 +7,7 @@ import {
   StyleSheet,
   SafeAreaView,
   Image,
-  Button,
+  Pressable,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -26,29 +26,32 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
 
   const renderTask = ({ item }: { item: TaskType }) => (
     <Animated.View entering={FadeInDown.delay(100)}>
-      <View style={styles.taskContainer}>
-        <View style={styles.taskDetails}>
-          <Text style={styles.taskTitle}>{item.title}</Text>
-          <Text style={styles.taskDescription}>{item.description}</Text>
-          <Text style={styles.taskDueDate}>
-            Due Date: {item.dueDate.toLocaleDateString()}
-          </Text>
-          <Text style={styles.taskCompletion}>
-            {item.completed ? "Completed" : "Pending"}
-          </Text>
+      <TouchableOpacity
+        style={styles.viewButton}
+        onPress={() => handleViewTask(item)}
+      >
+        <View style={styles.taskContainer}>
+          <View style={styles.taskDetails}>
+            <Text style={styles.taskTitle}>{item.title}</Text>
+            <Text style={styles.taskDescription}>{item.description}</Text>
+            <Text style={styles.taskDueDate}>
+              Due Date: {item.dueDate.toLocaleDateString()}
+            </Text>
+            <Text style={styles.taskCompletion}>
+              {item.completed ? "Completed" : "Pending"}
+            </Text>
+          </View>
         </View>
-        <TouchableOpacity
-          style={styles.viewButton}
-          onPress={() => handleViewTask(item)}
-        >
-          <Text style={styles.viewButtonText}>View</Text>
-        </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     </Animated.View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.circleContainer}>
+        <View style={[styles.circle, styles.lightBlue]} />
+        <View style={[styles.circle, styles.darkBlue]} />
+      </View>
       {tasks.length > 0 ? (
         <FlatList
           data={tasks}
@@ -58,20 +61,23 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
         />
       ) : (
         <View style={styles.emptyContainer}>
-          <Image
-            source={imageAssets.welcome}
-            style={{
-              marginBottom: 24,
-            }}
-          />
+          <View style={styles.welcomeImageContainer}>
+            <Image
+              resizeMethod="scale"
+              style={styles.welcomeImage}
+              source={imageAssets.welcome}
+            />
+          </View>
           <Text style={styles.emptyText}>
             {/* Add image from assets */}
             No tasks available. Add some tasks to get started!
           </Text>
-          <Button
-            title="Go to Details"
+          <Pressable
+            style={styles.addButton}
             onPress={() => navigation.navigate("NewTask")}
-          />
+          >
+            <Text style={styles.addButtonText}>Create a Task</Text>
+          </Pressable>
         </View>
       )}
     </SafeAreaView>
@@ -88,15 +94,15 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingTop: 8,
   },
-
   taskText: {
     fontSize: 16,
     flex: 1,
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
+    paddingTop: 150,
   },
   emptyText: {
     fontSize: 18,
@@ -129,16 +135,63 @@ const styles = StyleSheet.create({
   },
   taskCompletion: {
     fontSize: 14,
-    // color: item.completion ? "green" : "red",
   },
   viewButton: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: "#007BFF",
     borderRadius: 4,
+    shadowColor: "#000",
   },
   viewButtonText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  addButton: {
+    backgroundColor: "#50C2C9",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 200,
+    height: 50,
+    borderRadius: 10,
+    top: "40%",
+  },
+  addButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "400",
+  },
+  welcomeImage: {
+    width: 200,
+    height: 150,
+  },
+  welcomeImageContainer: {
+    width: 250,
+    height: 200,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  circleContainer: {
+    transform: [{ rotate: "-45deg" }],
+  },
+  circle: {
+    width: 150,
+    height: 150,
+    borderRadius: 70,
+    position: "absolute",
+    top: -80,
+  },
+  lightBlue: {
+    backgroundColor: "#50C2C9",
+    left: 0,
+  },
+  darkBlue: {
+    backgroundColor: "#8FE1D7",
+    opacity: 0.5,
+    left: 100,
+  },
+  lighterBlue: {
+    backgroundColor: "lightcyan",
   },
 });
