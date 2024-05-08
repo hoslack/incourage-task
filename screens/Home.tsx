@@ -28,6 +28,20 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
     navigation.navigate("TaskView", { taskId: task.id });
   };
 
+  const handleDeleteTask = async (task: TaskType) => {
+    try {
+      const jsonTasks = await AsyncStorage.getItem("taskData");
+      if (jsonTasks) {
+        let tasks: TaskType[] = JSON.parse(jsonTasks);
+        tasks = tasks.filter((t) => t.id !== task.id);
+        await AsyncStorage.setItem("taskData", JSON.stringify(tasks));
+        setTasks(tasks);
+      }
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+    }
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       const fetchTasks = async () => {
@@ -59,7 +73,7 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
           <FlatList
             data={tasks}
             renderItem={(task) =>
-              renderTask({ item: task.item, handleViewTask })
+              renderTask({ item: task.item, handleViewTask, handleDeleteTask })
             }
             keyExtractor={(item: TaskType) => item.id}
             contentContainerStyle={styles.listContainer}
@@ -79,12 +93,14 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
           </Pressable>
         </View>
       )}
-      <TouchableOpacity
-        style={styles.floatingButtonContianer}
-        onPress={() => navigation.navigate("NewTask")}
-      >
-        <Icon name="pluscircle" size={60} color="#023d3b" />
-      </TouchableOpacity>
+      {tasks.length > 0 && (
+        <TouchableOpacity
+          style={styles.floatingButtonContianer}
+          onPress={() => navigation.navigate("NewTask")}
+        >
+          <Icon name="pluscircle" size={60} color="#023d3b" />
+        </TouchableOpacity>
+      )}
     </SafeAreaView>
   );
 };

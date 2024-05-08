@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
-  Switch,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
@@ -16,19 +15,20 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import dayjs from "dayjs";
 import uuid from "react-native-uuid";
 import { TaskType } from "../types/Task";
+import { Status } from "../enums/TaskStatus";
 
 const schema = yup.object().shape({
   title: yup.string().required("Title is required"),
   description: yup.string().required("Description is required"),
   dueDate: yup.date().required("Due date is required"),
-  completed: yup.boolean().required("Completed is required"),
+  status: yup.string().required("Status is required"),
 });
 
 interface TaskFormData {
   title: string;
   description: string;
   dueDate: Date;
-  completed: boolean;
+  status: string;
 }
 
 const TaskForm: React.FC = () => {
@@ -45,7 +45,7 @@ const TaskForm: React.FC = () => {
       title: "",
       description: "",
       dueDate: new Date(),
-      completed: false,
+      status: Status.Pending,
     },
   });
 
@@ -166,8 +166,15 @@ const TaskForm: React.FC = () => {
         <Text style={styles.label}>Completed:</Text>
         <Controller
           control={control}
-          name="completed"
-          render={() => <Switch value={false} disabled />}
+          name="status"
+          render={() => (
+            <TextInput
+              style={styles.input}
+              value={Status.Pending}
+              editable={false}
+              multiline
+            />
+          )}
         />
 
         <TouchableOpacity

@@ -1,15 +1,18 @@
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import dayjs from "dayjs";
+import Icon from "react-native-vector-icons/AntDesign";
 
 import { TaskType } from "../types/Task";
 
 export const renderTask = ({
   item,
   handleViewTask,
+  handleDeleteTask,
 }: {
   item: TaskType;
   handleViewTask: (task: TaskType) => void;
+  handleDeleteTask: (task: TaskType) => void;
 }) => (
   <Animated.View entering={FadeInDown.delay(100)}>
     <TouchableOpacity
@@ -21,12 +24,13 @@ export const renderTask = ({
           <Text style={styles.taskTitle}>{item.title}</Text>
           <Text style={styles.taskDescription}>{item.description}</Text>
           <Text style={styles.taskDueDate}>
-            Due Date: {dayjs(item.dueDate).format("DD/MM/YYYY")}
+            Due: {dayjs(item.dueDate).format("DD/MM/YYYY")}
           </Text>
-          <Text style={styles.taskCompletion}>
-            {item.completed ? "Completed" : "Pending"}
-          </Text>
+          <Text style={styles.taskCompletion}>{item.status}</Text>
         </View>
+        <TouchableOpacity onPress={() => handleDeleteTask(item)}>
+          <Icon name="delete" size={32} color="#FF6666" />
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   </Animated.View>

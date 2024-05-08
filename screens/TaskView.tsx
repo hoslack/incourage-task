@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Switch,
-  Button,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -76,13 +69,6 @@ const TaskView: React.FC<TaskViewProps> = ({
   const handleCancel = () => {
     setIsEditing(false);
     setEditedTask(task as TaskType);
-  };
-
-  const handleToggleCompletion = () => {
-    setEditedTask({
-      ...(editedTask as TaskType),
-      completed: !editedTask?.completed,
-    });
   };
 
   const handleEdit = () => {
