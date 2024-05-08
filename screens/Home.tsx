@@ -9,13 +9,14 @@ import {
   Image,
   Pressable,
 } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import Icon from "react-native-vector-icons/AntDesign";
 
 import { TaskType } from "../types/Task";
 import { tasks } from "../utils/sampleData";
 import { imageAssets } from "../assets/imageAssets";
 import { RootStackParamList } from "../App";
+import { renderTask } from "../components/Rendertask";
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, "Home">;
 
@@ -23,28 +24,6 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
   const handleViewTask = (task: TaskType) => {
     navigation.navigate("TaskView", { taskId: task.id });
   };
-
-  const renderTask = ({ item }: { item: TaskType }) => (
-    <Animated.View entering={FadeInDown.delay(100)}>
-      <TouchableOpacity
-        style={styles.viewButton}
-        onPress={() => handleViewTask(item)}
-      >
-        <View style={styles.taskContainer}>
-          <View style={styles.taskDetails}>
-            <Text style={styles.taskTitle}>{item.title}</Text>
-            <Text style={styles.taskDescription}>{item.description}</Text>
-            <Text style={styles.taskDueDate}>
-              Due Date: {item.dueDate.toLocaleDateString()}
-            </Text>
-            <Text style={styles.taskCompletion}>
-              {item.completed ? "Completed" : "Pending"}
-            </Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    </Animated.View>
-  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -59,7 +38,9 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
           </View>
           <FlatList
             data={tasks}
-            renderItem={renderTask}
+            renderItem={(task) =>
+              renderTask({ item: task.item, handleViewTask })
+            }
             keyExtractor={(item: TaskType) => item.id}
             contentContainerStyle={styles.listContainer}
           />
@@ -68,7 +49,6 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
         <View style={styles.emptyContainer}>
           <Image style={styles.welcomeImage} source={imageAssets.welcome} />
           <Text style={styles.emptyText}>
-            {/* Add image from assets */}
             No tasks available. Add some tasks to get started!
           </Text>
           <Pressable
@@ -79,6 +59,12 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
           </Pressable>
         </View>
       )}
+      <TouchableOpacity
+        style={styles.floatingButtonContianer}
+        onPress={() => navigation.navigate("NewTask")}
+      >
+        <Icon name="pluscircle" size={60} color="#023d3b" />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -124,39 +110,7 @@ const styles = StyleSheet.create({
     color: "#777",
     textAlign: "center",
   },
-  taskContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-  },
 
-  taskDetails: {
-    flex: 1,
-  },
-  taskTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  taskDescription: {
-    fontSize: 14,
-    color: "#666",
-  },
-  taskDueDate: {
-    fontSize: 14,
-    color: "#777",
-  },
-  taskCompletion: {
-    fontSize: 14,
-  },
-  viewButton: {
-    backgroundColor: "#BFEBE5",
-    borderRadius: 8,
-    marginVertical: 10,
-    shadowOffset: { width: -2, height: 1 },
-    shadowColor: "#000",
-    elevation: 5,
-  },
   viewButtonText: {
     color: "#fff",
     fontWeight: "bold",
@@ -201,5 +155,10 @@ const styles = StyleSheet.create({
   },
   lighterBlue: {
     backgroundColor: "lightcyan",
+  },
+  floatingButtonContianer: {
+    position: "absolute",
+    bottom: 30,
+    right: 10,
   },
 });
