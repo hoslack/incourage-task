@@ -1,31 +1,41 @@
 import * as React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+
 import Home from "./screens/Home";
+import NewTask from "./screens/NewTask";
+import TaskView from "./screens/TaskView";
 
-const Stack = createNativeStackNavigator();
+export type RootStackParamList = {
+  Home: undefined;
+  NewTask: undefined;
+  TaskView: { taskId: string };
+};
 
-function App() {
+const RootStack = createStackNavigator<RootStackParamList>();
+
+const customTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: "#F0F4F3",
+  },
+};
+
+const App: React.FC = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Home"
-          component={Home}
-          options={{
-            title: "Home Screen",
-            headerStyle: {
-              backgroundColor: "#f4511e",
-            },
-            headerTintColor: "#fff",
-            headerTitleStyle: {
-              fontWeight: "bold",
-            },
-          }}
-        />
-      </Stack.Navigator>
+    <NavigationContainer theme={customTheme}>
+      <RootStack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <RootStack.Screen name="Home" component={Home} />
+        <RootStack.Screen name="NewTask" component={NewTask} />
+        <RootStack.Screen name="TaskView" component={TaskView} />
+      </RootStack.Navigator>
     </NavigationContainer>
   );
-}
+};
 
 export default App;
