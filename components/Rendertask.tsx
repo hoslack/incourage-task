@@ -1,5 +1,6 @@
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import dayjs from "dayjs";
 
 import { TaskType } from "../types/Task";
 
@@ -20,7 +21,7 @@ export const renderTask = ({
           <Text style={styles.taskTitle}>{item.title}</Text>
           <Text style={styles.taskDescription}>{item.description}</Text>
           <Text style={styles.taskDueDate}>
-            Due Date: {item.dueDate.toLocaleDateString()}
+            Due Date: {dayjs(item.dueDate).format("DD/MM/YYYY")}
           </Text>
           <Text style={styles.taskCompletion}>
             {item.completed ? "Completed" : "Pending"}

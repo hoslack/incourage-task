@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -12,9 +12,9 @@ import {
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Icon from "react-native-vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 
 import { TaskType } from "../types/Task";
-import { tasks } from "../utils/sampleData";
 import { imageAssets } from "../assets/imageAssets";
 import { RootStackParamList } from "../App";
 import { renderTask } from "../components/Rendertask";
@@ -22,25 +22,28 @@ import { renderTask } from "../components/Rendertask";
 type HomeProps = NativeStackScreenProps<RootStackParamList, "Home">;
 
 const Home: React.FC<HomeProps> = ({ navigation }) => {
+  const [tasks, setTasks] = useState<TaskType[]>([]);
+
   const handleViewTask = (task: TaskType) => {
     navigation.navigate("TaskView", { taskId: task.id });
   };
 
-  // read async storage
-  useEffect(() => {
-    const getTasks = async () => {
-      try {
-        const taskData = await AsyncStorage.getItem("taskData");
-        if (taskData) {
-          const parsedData = JSON.parse(taskData);
-          console.log("Parsed data from AsyncStorage:", parsedData);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchTasks = async () => {
+        try {
+          const jsonTasks = await AsyncStorage.getItem("taskData");
+          if (jsonTasks) {
+            const tasks: TaskType[] = JSON.parse(jsonTasks);
+            setTasks(tasks);
+          }
+        } catch (error) {
+          console.error("Failed to fetch tasks:", error);
         }
-      } catch (error) {
-        console.error("Failed to get data from AsyncStorage:", error);
-      }
-    };
-    getTasks();
-  }, []);
+      };
+      fetchTasks();
+    }, [])
+  );
 
   return (
     <SafeAreaView style={styles.container}>
