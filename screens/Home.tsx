@@ -52,7 +52,7 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
         <View style={[styles.circle, styles.lightBlue]} />
         <View style={[styles.circle, styles.darkBlue]} />
       </View>
-      {tasks.length > 0 ? (
+      {[].length > 0 ? (
         <FlatList
           data={tasks}
           renderItem={renderTask}
@@ -61,13 +61,7 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
         />
       ) : (
         <View style={styles.emptyContainer}>
-          <View style={styles.welcomeImageContainer}>
-            <Image
-              resizeMethod="scale"
-              style={styles.welcomeImage}
-              source={imageAssets.welcome}
-            />
-          </View>
+          <Image style={styles.welcomeImage} source={imageAssets.welcome} />
           <Text style={styles.emptyText}>
             {/* Add image from assets */}
             No tasks available. Add some tasks to get started!
@@ -162,15 +156,8 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
   welcomeImage: {
-    width: 200,
-    height: 150,
-  },
-  welcomeImageContainer: {
-    width: 250,
-    height: 200,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+    width: 150,
+    resizeMode: "contain",
   },
   circleContainer: {
     transform: [{ rotate: "-45deg" }],
