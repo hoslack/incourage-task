@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Text,
   View,
@@ -163,7 +163,7 @@ const TaskForm: React.FC = () => {
           <Text style={styles.errorText}>{errors.dueDate.message}</Text>
         )}
 
-        <Text style={styles.label}>Completed:</Text>
+        <Text style={styles.label}>Status:</Text>
         <Controller
           control={control}
           name="status"

@@ -24,24 +24,6 @@ type HomeProps = NativeStackScreenProps<RootStackParamList, "Home">;
 const Home: React.FC<HomeProps> = ({ navigation }) => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
 
-  const handleViewTask = (task: TaskType) => {
-    navigation.navigate("TaskView", { taskId: task.id });
-  };
-
-  const handleDeleteTask = async (task: TaskType) => {
-    try {
-      const jsonTasks = await AsyncStorage.getItem("taskData");
-      if (jsonTasks) {
-        let tasks: TaskType[] = JSON.parse(jsonTasks);
-        tasks = tasks.filter((t) => t.id !== task.id);
-        await AsyncStorage.setItem("taskData", JSON.stringify(tasks));
-        setTasks(tasks);
-      }
-    } catch (error) {
-      console.error("Failed to delete task:", error);
-    }
-  };
-
   useFocusEffect(
     React.useCallback(() => {
       const fetchTasks = async () => {
@@ -58,6 +40,24 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
       fetchTasks();
     }, [])
   );
+
+  const handleViewTask = (task: TaskType) => {
+    navigation.navigate("TaskView", { taskId: task.id });
+  };
+
+  const handleDeleteTask = async (task: TaskType) => {
+    try {
+      const jsonTasks = await AsyncStorage.getItem("taskData");
+      if (jsonTasks) {
+        let tasks: TaskType[] = JSON.parse(jsonTasks);
+        tasks = tasks.filter((tsk) => tsk.id !== task.id);
+        await AsyncStorage.setItem("taskData", JSON.stringify(tasks));
+        setTasks(tasks);
+      }
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
