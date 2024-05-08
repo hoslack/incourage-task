@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,73 +7,84 @@ import {
   StyleSheet,
   SafeAreaView,
   Image,
-  Button,
+  Pressable,
 } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import Icon from "react-native-vector-icons/AntDesign";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 
 import { TaskType } from "../types/Task";
-import { tasks } from "../utils/sampleData";
 import { imageAssets } from "../assets/imageAssets";
 import { RootStackParamList } from "../App";
+import { renderTask } from "../components/Rendertask";
 
 type HomeProps = NativeStackScreenProps<RootStackParamList, "Home">;
 
 const Home: React.FC<HomeProps> = ({ navigation }) => {
+  const [tasks, setTasks] = useState<TaskType[]>([]);
+
   const handleViewTask = (task: TaskType) => {
     navigation.navigate("TaskView", { taskId: task.id });
   };
 
-  const renderTask = ({ item }: { item: TaskType }) => (
-    <Animated.View entering={FadeInDown.delay(100)}>
-      <View style={styles.taskContainer}>
-        <View style={styles.taskDetails}>
-          <Text style={styles.taskTitle}>{item.title}</Text>
-          <Text style={styles.taskDescription}>{item.description}</Text>
-          <Text style={styles.taskDueDate}>
-            Due Date: {item.dueDate.toLocaleDateString()}
-          </Text>
-          <Text style={styles.taskCompletion}>
-            {item.completed ? "Completed" : "Pending"}
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={styles.viewButton}
-          onPress={() => handleViewTask(item)}
-        >
-          <Text style={styles.viewButtonText}>View</Text>
-        </TouchableOpacity>
-      </View>
-    </Animated.View>
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchTasks = async () => {
+        try {
+          const jsonTasks = await AsyncStorage.getItem("taskData");
+          if (jsonTasks) {
+            const tasks: TaskType[] = JSON.parse(jsonTasks);
+            setTasks(tasks);
+          }
+        } catch (error) {
+          console.error("Failed to fetch tasks:", error);
+        }
+      };
+      fetchTasks();
+    }, [])
   );
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.circleContainer}>
+        <View style={[styles.circle, styles.lightBlue]} />
+        <View style={[styles.circle, styles.darkBlue]} />
+      </View>
       {tasks.length > 0 ? (
-        <FlatList
-          data={tasks}
-          renderItem={renderTask}
-          keyExtractor={(item: TaskType) => item.id}
-          contentContainerStyle={styles.listContainer}
-        />
+        <SafeAreaView>
+          <View style={styles.listHeader}>
+            <Text style={styles.listHeaderText}>Your Tasks</Text>
+          </View>
+          <FlatList
+            data={tasks}
+            renderItem={(task) =>
+              renderTask({ item: task.item, handleViewTask })
+            }
+            keyExtractor={(item: TaskType) => item.id}
+            contentContainerStyle={styles.listContainer}
+          />
+        </SafeAreaView>
       ) : (
         <View style={styles.emptyContainer}>
-          <Image
-            source={imageAssets.welcome}
-            style={{
-              marginBottom: 24,
-            }}
-          />
+          <Image style={styles.welcomeImage} source={imageAssets.welcome} />
           <Text style={styles.emptyText}>
-            {/* Add image from assets */}
             No tasks available. Add some tasks to get started!
           </Text>
-          <Button
-            title="Go to Details"
+          <Pressable
+            style={styles.addButton}
             onPress={() => navigation.navigate("NewTask")}
-          />
+          >
+            <Text style={styles.addButtonText}>Create a Task</Text>
+          </Pressable>
         </View>
       )}
+      <TouchableOpacity
+        style={styles.floatingButtonContianer}
+        onPress={() => navigation.navigate("NewTask")}
+      >
+        <Icon name="pluscircle" size={60} color="#023d3b" />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -84,61 +95,90 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: "#f3ffff",
   },
   listContainer: {
     paddingTop: 8,
+    backgroundColor: "#f3ffff",
   },
-
   taskText: {
     fontSize: 16,
     flex: 1,
   },
-  emptyContainer: {
-    flex: 1,
+  listHeader: {
+    height: 60,
+    marginTop: 16,
+    display: "flex",
     justifyContent: "center",
     alignItems: "center",
+  },
+  listHeaderText: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#ffff",
+    textShadowColor: "#000",
+    textShadowRadius: 5,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "center",
+    paddingTop: 150,
   },
   emptyText: {
     fontSize: 18,
     color: "#777",
     textAlign: "center",
   },
-  taskContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-    marginVertical: 8,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
-  },
-  taskDetails: {
-    flex: 1,
-  },
-  taskTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  taskDescription: {
-    fontSize: 14,
-    color: "#666",
-  },
-  taskDueDate: {
-    fontSize: 14,
-    color: "#777",
-  },
-  taskCompletion: {
-    fontSize: 14,
-    // color: item.completion ? "green" : "red",
-  },
-  viewButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    backgroundColor: "#007BFF",
-    borderRadius: 4,
-  },
+
   viewButtonText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  addButton: {
+    backgroundColor: "#50C2C9",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 200,
+    height: 50,
+    borderRadius: 10,
+    top: "40%",
+  },
+  addButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "400",
+  },
+  welcomeImage: {
+    width: 150,
+    resizeMode: "contain",
+  },
+  circleContainer: {
+    transform: [{ rotate: "-45deg" }],
+  },
+  circle: {
+    width: 150,
+    height: 150,
+    borderRadius: 70,
+    position: "absolute",
+    top: -80,
+  },
+  lightBlue: {
+    backgroundColor: "#50C2C9",
+    left: 0,
+  },
+  darkBlue: {
+    backgroundColor: "#8FE1D7",
+    opacity: 0.5,
+    left: 100,
+  },
+  lighterBlue: {
+    backgroundColor: "lightcyan",
+  },
+  floatingButtonContianer: {
+    position: "absolute",
+    bottom: 30,
+    right: 10,
   },
 });
