@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Icon from "react-native-vector-icons/AntDesign";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { TaskType } from "../types/Task";
 import { tasks } from "../utils/sampleData";
@@ -24,6 +25,22 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
   const handleViewTask = (task: TaskType) => {
     navigation.navigate("TaskView", { taskId: task.id });
   };
+
+  // read async storage
+  useEffect(() => {
+    const getTasks = async () => {
+      try {
+        const taskData = await AsyncStorage.getItem("taskData");
+        if (taskData) {
+          const parsedData = JSON.parse(taskData);
+          console.log("Parsed data from AsyncStorage:", parsedData);
+        }
+      } catch (error) {
+        console.error("Failed to get data from AsyncStorage:", error);
+      }
+    };
+    getTasks();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
