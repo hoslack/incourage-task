@@ -16,10 +16,6 @@ const RootStack = createStackNavigator<RootStackParamList>();
 
 const customTheme = {
   ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: "#F0F4F3",
-  },
 };
 
 const App: React.FC = () => {

@@ -52,13 +52,18 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
         <View style={[styles.circle, styles.lightBlue]} />
         <View style={[styles.circle, styles.darkBlue]} />
       </View>
-      {[].length > 0 ? (
-        <FlatList
-          data={tasks}
-          renderItem={renderTask}
-          keyExtractor={(item: TaskType) => item.id}
-          contentContainerStyle={styles.listContainer}
-        />
+      {tasks.length > 0 ? (
+        <SafeAreaView>
+          <View style={styles.listHeader}>
+            <Text style={styles.listHeaderText}>Your Tasks</Text>
+          </View>
+          <FlatList
+            data={tasks}
+            renderItem={renderTask}
+            keyExtractor={(item: TaskType) => item.id}
+            contentContainerStyle={styles.listContainer}
+          />
+        </SafeAreaView>
       ) : (
         <View style={styles.emptyContainer}>
           <Image style={styles.welcomeImage} source={imageAssets.welcome} />
@@ -84,13 +89,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: "#f3ffff",
   },
   listContainer: {
     paddingTop: 8,
+    backgroundColor: "#f3ffff",
   },
   taskText: {
     fontSize: 16,
     flex: 1,
+  },
+  listHeader: {
+    height: 60,
+    marginTop: 16,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  listHeaderText: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#ffff",
+    textShadowColor: "#000",
+    textShadowRadius: 5,
   },
   emptyContainer: {
     flex: 1,
@@ -108,10 +129,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
-    marginVertical: 8,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
   },
+
   taskDetails: {
     flex: 1,
   },
@@ -131,10 +150,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   viewButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
+    backgroundColor: "#BFEBE5",
+    borderRadius: 8,
+    marginVertical: 10,
+    shadowOffset: { width: -2, height: 1 },
     shadowColor: "#000",
+    elevation: 5,
   },
   viewButtonText: {
     color: "#fff",
