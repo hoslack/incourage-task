@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Image,
   Pressable,
+  ToastAndroid,
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Icon from "react-native-vector-icons/AntDesign";
@@ -23,6 +24,7 @@ type HomeProps = NativeStackScreenProps<RootStackParamList, "Home">;
 
 const Home: React.FC<HomeProps> = ({ navigation }) => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
+  const [refresh, setRefresh] = useState<number>(0);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -34,11 +36,15 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
             setTasks(tasks);
           }
         } catch (error) {
-          console.error("Failed to fetch tasks:", error);
+          ToastAndroid.showWithGravity(
+            "Failed to fetch tasks",
+            ToastAndroid.SHORT,
+            ToastAndroid.TOP
+          );
         }
       };
       fetchTasks();
-    }, [])
+    }, [refresh])
   );
 
   const handleViewTask = (task: TaskType) => {
@@ -55,7 +61,12 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
         setTasks(tasks);
       }
     } catch (error) {
-      console.error("Failed to delete task:", error);
+      ToastAndroid.showWithGravity(
+        "Failed to delete task",
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP
+      );
+      setRefresh(refresh + 1);
     }
   };
 
