@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Text,
   View,
@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
-  Switch,
+  ToastAndroid,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
@@ -15,23 +15,29 @@ import * as yup from "yup";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import dayjs from "dayjs";
 import uuid from "react-native-uuid";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+
 import { TaskType } from "../types/Task";
+import { Status } from "../enums/TaskStatus";
+import { RootStackParamList } from "../App";
 
 const schema = yup.object().shape({
   title: yup.string().required("Title is required"),
   description: yup.string().required("Description is required"),
   dueDate: yup.date().required("Due date is required"),
-  completed: yup.boolean().required("Completed is required"),
+  status: yup.string().required("Status is required"),
 });
 
 interface TaskFormData {
   title: string;
   description: string;
   dueDate: Date;
-  completed: boolean;
+  status: string;
 }
 
-const TaskForm: React.FC = () => {
+type NewTaskProps = NativeStackScreenProps<RootStackParamList, "NewTask">;
+
+const NewTask: React.FC<NewTaskProps> = ({ navigation }) => {
   const [showPicker, setShowPicker] = useState(false);
 
   const {
@@ -45,16 +51,14 @@ const TaskForm: React.FC = () => {
       title: "",
       description: "",
       dueDate: new Date(),
-      completed: false,
+      status: Status.Pending,
     },
   });
 
   const onSubmit: SubmitHandler<TaskFormData> = async (data) => {
-    console.log("Data submitted:", data);
     const id = uuid.v4() as string;
     try {
       const newTask = { ...data, id };
-      // add new task to  array of tasks in AsyncStorage
       const jsonTasks = await AsyncStorage.getItem("taskData");
       let tasks: TaskType[] = [];
       if (jsonTasks) {
@@ -63,12 +67,21 @@ const TaskForm: React.FC = () => {
       tasks.push(newTask);
       const jsonData = JSON.stringify(tasks);
       await AsyncStorage.setItem("taskData", jsonData);
-      console.log("Data stored in AsyncStorage:", jsonData);
+
+      ToastAndroid.showWithGravity(
+        "Task added successfully",
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP
+      );
       setValue("title", "");
       setValue("description", "");
       setValue("dueDate", new Date());
     } catch (error) {
-      console.error("Failed to store data:", error);
+      ToastAndroid.showWithGravity(
+        "Failed to add task",
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP
+      );
     }
   };
 
@@ -140,18 +153,7 @@ const TaskForm: React.FC = () => {
               )}
               <TouchableOpacity
                 onPress={() => setShowPicker(true)}
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "flex-start",
-                  borderStyle: "solid",
-                  borderWidth: 1,
-                  borderColor: "#ccc",
-                  height: 50,
-                  paddingLeft: 6,
-                  borderRadius: 4,
-                  backgroundColor: "#fff",
-                }}
+                style={styles.date}
               >
                 <Text>{dayjs(field.value).format("DD/MM/YYYY")}</Text>
               </TouchableOpacity>
@@ -163,23 +165,40 @@ const TaskForm: React.FC = () => {
           <Text style={styles.errorText}>{errors.dueDate.message}</Text>
         )}
 
-        <Text style={styles.label}>Completed:</Text>
+        <Text style={styles.label}>Status:</Text>
         <Controller
           control={control}
-          name="completed"
-          render={() => <Switch value={false} disabled />}
+          name="status"
+          render={() => (
+            <TextInput
+              style={styles.input}
+              value={Status.Pending}
+              editable={false}
+              multiline
+            />
+          )}
         />
 
-        <TouchableOpacity
-          style={styles.submitBtn}
-          onPress={handleSubmit(onSubmit)}
-        >
-          <Text style={{ color: "#fff" }}>Submit</Text>
-        </TouchableOpacity>
+        <View style={styles.flexBtns}>
+          <TouchableOpacity
+            style={styles.cancelBtn}
+            onPress={() => navigation.navigate("Home")}
+          >
+            <Text style={styles.textWhite}>Back</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.submitBtn}
+            onPress={handleSubmit(onSubmit)}
+          >
+            <Text style={styles.textWhite}>Submit</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
 };
+
+export default NewTask;
 
 const styles = StyleSheet.create({
   container: {
@@ -228,7 +247,17 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    width: "100%",
+    width: "40%",
+    height: 50,
+    borderRadius: 10,
+    marginTop: 100,
+  },
+  cancelBtn: {
+    backgroundColor: "#FF6666",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "40%",
     height: 50,
     borderRadius: 10,
     marginTop: 100,
@@ -255,6 +284,24 @@ const styles = StyleSheet.create({
   lighterBlue: {
     backgroundColor: "lightcyan",
   },
+  date: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    height: 50,
+    paddingLeft: 6,
+    borderRadius: 4,
+    backgroundColor: "#fff",
+  },
+  flexBtns: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  textWhite: {
+    color: "#fff",
+  },
 });
-
-export default TaskForm;

@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Image,
   Pressable,
+  ToastAndroid,
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Icon from "react-native-vector-icons/AntDesign";
@@ -23,10 +24,7 @@ type HomeProps = NativeStackScreenProps<RootStackParamList, "Home">;
 
 const Home: React.FC<HomeProps> = ({ navigation }) => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
-
-  const handleViewTask = (task: TaskType) => {
-    navigation.navigate("TaskView", { taskId: task.id });
-  };
+  const [refresh, setRefresh] = useState<number>(0);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -38,12 +36,39 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
             setTasks(tasks);
           }
         } catch (error) {
-          console.error("Failed to fetch tasks:", error);
+          ToastAndroid.showWithGravity(
+            "Failed to fetch tasks",
+            ToastAndroid.SHORT,
+            ToastAndroid.TOP
+          );
         }
       };
       fetchTasks();
-    }, [])
+    }, [refresh])
   );
+
+  const handleViewTask = (task: TaskType) => {
+    navigation.navigate("TaskView", { taskId: task.id });
+  };
+
+  const handleDeleteTask = async (task: TaskType) => {
+    try {
+      const jsonTasks = await AsyncStorage.getItem("taskData");
+      if (jsonTasks) {
+        let tasks: TaskType[] = JSON.parse(jsonTasks);
+        tasks = tasks.filter((tsk) => tsk.id !== task.id);
+        await AsyncStorage.setItem("taskData", JSON.stringify(tasks));
+        setTasks(tasks);
+      }
+    } catch (error) {
+      ToastAndroid.showWithGravity(
+        "Failed to delete task",
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP
+      );
+      setRefresh(refresh + 1);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -59,7 +84,7 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
           <FlatList
             data={tasks}
             renderItem={(task) =>
-              renderTask({ item: task.item, handleViewTask })
+              renderTask({ item: task.item, handleViewTask, handleDeleteTask })
             }
             keyExtractor={(item: TaskType) => item.id}
             contentContainerStyle={styles.listContainer}
@@ -79,12 +104,14 @@ const Home: React.FC<HomeProps> = ({ navigation }) => {
           </Pressable>
         </View>
       )}
-      <TouchableOpacity
-        style={styles.floatingButtonContianer}
-        onPress={() => navigation.navigate("NewTask")}
-      >
-        <Icon name="pluscircle" size={60} color="#023d3b" />
-      </TouchableOpacity>
+      {tasks.length > 0 && (
+        <TouchableOpacity
+          style={styles.floatingButtonContianer}
+          onPress={() => navigation.navigate("NewTask")}
+        >
+          <Icon name="pluscircle" size={60} color="#023d3b" />
+        </TouchableOpacity>
+      )}
     </SafeAreaView>
   );
 };
