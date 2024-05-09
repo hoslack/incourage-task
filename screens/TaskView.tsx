@@ -157,7 +157,9 @@ const TaskView: React.FC<TaskViewProps> = ({
         <View style={[styles.circle, styles.darkBlue]} />
       </View>
       <View style={styles.listHeader}>
-        <Text style={styles.listHeaderText}>View Task</Text>
+        <Text style={styles.listHeaderText}>
+          {`${editMode ? "Edit " : "View "} Task `}
+        </Text>
       </View>
       <View style={styles.formView}>
         <Text style={styles.label}>Title:</Text>
