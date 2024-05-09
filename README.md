@@ -2,6 +2,7 @@
 
 Welcome to the **Incourage Task Manager** React Native project! This guide will help you set up, install, and run the project locally on your machine.
 
+
 ## Table of Contents
 
 - [Task Manager](#task-manager)
@@ -13,6 +14,7 @@ Welcome to the **Incourage Task Manager** React Native project! This guide will 
   - [Dependencies](#dependencies)
   - [Contributing](#contributing)
   - [License](#license)
+  - [Screenshots](#screenshots)
 
 ## Prerequisites
 
@@ -120,5 +122,13 @@ If you wish to contribute to this project, please fork the repository and create
 This project is licensed under the [MIT License](LICENSE).
 
 ---
+
+## Screenshots
+
+![Screenshot_2024-05-09-12-14-45-47_f73b71075b1de7323614b647fe394240](https://github.com/hoslack/incourage-task/assets/15017978/d2288c23-461c-43fb-a4ac-aeac8b5d500e)
+![Screenshot_2024-05-09-12-12-30-92_f73b71075b1de7323614b647fe394240](https://github.com/hoslack/incourage-task/assets/15017978/d5b4c29a-1b2c-442c-9542-398597c1966a)
+![Screenshot_2024-05-09-12-12-24-46_f73b71075b1de7323614b647fe394240](https://github.com/hoslack/incourage-task/assets/15017978/872a17b5-fa09-4120-83aa-c8e74015fb4e)
+![Screenshot_2024-05-09-12-11-51-24_f73b71075b1de7323614b647fe394240](https://github.com/hoslack/incourage-task/assets/15017978/ca276e9e-5337-44a8-b6c1-a3dc9f0c1b0b)
+![Screenshot_2024-05-09-12-11-15-60_f73b71075b1de7323614b647fe394240](https://github.com/hoslack/incourage-task/assets/15017978/a7ec4933-73b6-4dfd-bf85-aa76b9a890fd)
 
 Thank you for checking out the Incourage Task project! If you encounter any issues, please feel free to open an issue on the repository. Happy coding!
